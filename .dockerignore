@@ -63,6 +63,3 @@ docker-compose.yml
 .prettierignore
 .eslintrc*
 .editorconfig
-tsconfig.json
-vite.config.ts
-svelte.config.js
