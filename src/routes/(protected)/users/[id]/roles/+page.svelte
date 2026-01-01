@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { userDetailStore } from '$lib/modules/user-management/stores';
 	import { roleStore } from '$lib/modules/rbac-management/stores';
 	import { UserRoleSelector, UserPermissionViewer } from '$lib/modules/user-management/components';
@@ -9,7 +9,7 @@
 	import Button from '$lib/modules/shared/components/Button.svelte';
 	import Spinner from '$lib/modules/shared/components/Spinner.svelte';
 
-	const userId = $derived($page.params.id as string);
+	const userId = $derived(page.params.id as string);
 
 	let loadingRoles = $state(false);
 	let loadingPermissions = $state(false);

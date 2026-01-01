@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { RoleForm } from '$lib/modules/rbac-management/components';
 	import { roleStore } from '$lib/modules/rbac-management/stores';
 	import { showToast } from '$lib/modules/shared/components';
@@ -9,7 +9,7 @@
 	import Button from '$lib/modules/shared/components/Button.svelte';
 	import type { UpdateRoleRequest, CreateRoleRequest } from '$lib/modules/shared/types';
 
-	const roleId = $derived($page.params.id as string);
+	const roleId = $derived(page.params.id as string);
 
 	let loading = $state(false);
 

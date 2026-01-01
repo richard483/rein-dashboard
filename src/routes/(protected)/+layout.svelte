@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { authStore, currentUser, isSuperAdmin, isAuthenticated } from '$lib/modules/shared/auth';
 	import { showToast } from '$lib/modules/shared/components';
 	import type { Snippet } from 'svelte';
@@ -12,7 +12,7 @@
 
 	let { children }: Props = $props();
 
-	const currentPath = $derived($page.url.pathname);
+	const currentPath = $derived(page.url.pathname);
 
 	onMount(() => {
 		// Check authentication

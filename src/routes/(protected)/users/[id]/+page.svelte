@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { UserForm } from '$lib/modules/user-management/components';
 	import { userDetailStore } from '$lib/modules/user-management/stores';
 	import { showToast } from '$lib/modules/shared/components';
@@ -9,7 +9,7 @@
 	import Button from '$lib/modules/shared/components/Button.svelte';
 	import type { UpdateUserRequest } from '$lib/modules/shared/types';
 
-	const userId = $derived($page.params.id as string);
+	const userId = $derived(page.params.id as string);
 
 	let loading = $state(false);
 
