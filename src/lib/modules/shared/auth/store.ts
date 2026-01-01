@@ -137,9 +137,8 @@ export const currentUser = derived(authStore, ($auth) => $auth.user);
 export const isAuthenticated = derived(authStore, ($auth) => $auth.isAuthenticated);
 
 export const isSuperAdmin = derived(authStore, ($auth) => {
-  console.log($auth.user);
   if (!$auth.user || !$auth.user.roles) return false;
-  return $auth.user.roles.some((role) => role.name.toLowerCase() === 'superadmin');
+  return $auth.user.roles.some((role) => role.toLowerCase() === 'superadmin');
 });
 
 export const isLoading = derived(authStore, ($auth) => $auth.isLoading);

@@ -25,14 +25,14 @@ export interface User {
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
-  roles?: { name: string }[]; // For superadmin check
+  roles?: string[]; // For superadmin check
 }
 
 export interface UserInfo {
   id: string;
   username: string;
   is_active: boolean;
-  roles?: { name: string }[];
+  roles?: string[];
 }
 
 export interface CreateUserRequest {
