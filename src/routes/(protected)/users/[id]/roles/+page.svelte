@@ -84,9 +84,9 @@
 
 	{#if $userDetailStore.user}
 		<div class="user-info card">
-			<h3>{$userDetailStore.user.username}</h3>
+			<h3>{$userDetailStore.user.UserName}</h3>
 			<p class="text-muted">
-				Status: {$userDetailStore.user.is_active ? 'Active' : 'Inactive'}
+				Status: {$userDetailStore.user.IsActive ? 'Active' : 'Inactive'}
 			</p>
 		</div>
 	{/if}

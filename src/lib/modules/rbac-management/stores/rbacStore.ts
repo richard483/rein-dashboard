@@ -50,15 +50,15 @@ function createRoleStore() {
       update((state) => ({ ...state, loading: true, error: null }));
 
       try {
-        const roles = await roleApi.listRoles();
+        const response = await roleApi.listRoles();
 
         update((state) => ({
           ...state,
-          roles,
+          roles: response.roles,
           loading: false
         }));
 
-        return roles;
+        return response.roles;
       } catch (error) {
         update((state) => ({
           ...state,
@@ -188,15 +188,15 @@ function createPermissionStore() {
       update((state) => ({ ...state, loading: true, error: null }));
 
       try {
-        const permissions = await permissionApi.listPermissions();
+        const response = await permissionApi.listPermissions();
 
         update((state) => ({
           ...state,
-          permissions,
+          permissions: response.permissions,
           loading: false
         }));
 
-        return permissions;
+        return response.permissions;
       } catch (error) {
         update((state) => ({
           ...state,

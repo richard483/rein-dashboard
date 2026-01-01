@@ -4,11 +4,13 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
   DeleteUserRequest,
-  PaginatedResponse,
+  ListUsersResponse,
   UserRole,
   UserPermission,
   AssignRolesRequest,
-  ApiResponse
+  ApiResponse,
+  GetUserRolesResponse,
+  GetUserPermissionsResponse
 } from '$lib/modules/shared/types';
 
 /**
@@ -16,8 +18,8 @@ import type {
  */
 
 // List all users with pagination
-export async function listUsers(page = 1, pageSize = 10): Promise<PaginatedResponse<User>> {
-  return api.get<PaginatedResponse<User>>(`/user/data?page=${page}&page_size=${pageSize}`);
+export async function listUsers(page = 1, pageSize = 10): Promise<ListUsersResponse> {
+  return api.get<ListUsersResponse>(`/user/data?page=${page}&page_size=${pageSize}`);
 }
 
 // Get user by ID
@@ -46,9 +48,8 @@ export async function deleteUser(id: string): Promise<ApiResponse> {
 }
 
 // Get user roles
-export async function getUserRoles(userId: string): Promise<UserRole[]> {
-  const response = await api.get<ApiResponse>(`/admin/users/${userId}/roles`);
-  return response.data as UserRole[];
+export async function getUserRoles(userId: string): Promise<GetUserRolesResponse> {
+  return api.get<GetUserRolesResponse>(`/admin/users/${userId}/roles`);
 }
 
 // Assign roles to user
@@ -70,7 +71,6 @@ export async function removeRolesFromUser(
 }
 
 // Get user effective permissions
-export async function getUserPermissions(userId: string): Promise<UserPermission[]> {
-  const response = await api.get<ApiResponse>(`/admin/users/${userId}/permissions`);
-  return response.data as UserPermission[];
+export async function getUserPermissions(userId: string): Promise<GetUserPermissionsResponse> {
+  return api.get<GetUserPermissionsResponse>(`/admin/users/${userId}/permissions`);
 }

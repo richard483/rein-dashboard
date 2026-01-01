@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { Role, UserRole } from '$lib/modules/shared/types';
+	import type { Role } from '$lib/modules/shared/types';
 	import Button from '$lib/modules/shared/components/Button.svelte';
 	import Spinner from '$lib/modules/shared/components/Spinner.svelte';
 
 	interface Props {
 		availableRoles: Role[];
-		assignedRoles: UserRole[];
+		assignedRoles: Role[];
 		loading?: boolean;
 		onAssign: (roleIds: string[]) => void;
 		onRemove: (roleIds: string[]) => void;
@@ -15,7 +15,7 @@
 
 	let selectedRoleIds = $state<Set<string>>(new Set());
 
-	const assignedRoleIds = $derived(new Set(assignedRoles.map((r) => r.role_id)));
+	const assignedRoleIds = $derived(new Set(assignedRoles.map((r) => r.id)));
 
 	const unassignedRoles = $derived(
 		availableRoles.filter((role) => !assignedRoleIds.has(role.id))
@@ -55,12 +55,12 @@
 					{#each assignedRoles as role}
 						<div class="role-item">
 							<div>
-								<strong>{role.role_name}</strong>
+								<strong>{role.name}</strong>
 								{#if role.description}
 									<p class="text-muted">{role.description}</p>
 								{/if}
 							</div>
-							<button class="btn-remove" onclick={() => handleRemove(role.role_id)}>
+							<button class="btn-remove" onclick={() => handleRemove(role.id)}>
 								Remove
 							</button>
 						</div>

@@ -36,11 +36,11 @@
 	}
 
 	function handleEditUser(user: User) {
-		goto(`/users/${user.id}`);
+		goto(`/users/${user.ID}`);
 	}
 
 	function handleViewRoles(user: User) {
-		goto(`/users/${user.id}/roles`);
+		goto(`/users/${user.ID}/roles`);
 	}
 
 	function handleDeleteClick(user: User) {
@@ -52,7 +52,7 @@
 		if (!userToDelete) return;
 
 		try {
-			await userListStore.deleteUser(userToDelete.id);
+			await userListStore.deleteUser(userToDelete.ID);
 			showToast('User deleted successfully', 'success');
 			loadUsers();
 		} catch (error: any) {

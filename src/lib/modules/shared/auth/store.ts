@@ -1,17 +1,14 @@
 import { writable, derived } from 'svelte/store';
-import type { UserInfo, LoginRequest, LoginResponse, ApiError } from '../types';
+import type { UserInfo, LoginRequest, LoginResponse, ApiError, AuthState, ProfileResponse, ApiResponse } from '../types';
 import { api, setTokens, clearTokens, getAccessToken } from '../api/client';
 
-interface AuthState {
-  user: UserInfo | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: ApiError | null;
-}
 
 const initialState: AuthState = {
   user: null,
+  accessToken: null,
+  refreshToken: null,
   isAuthenticated: false,
+  isSuperAdmin: false,
   isLoading: false,
   error: null
 };
@@ -33,8 +30,16 @@ function createAuthStore() {
 
         update((state) => ({
           ...state,
-          user: response.user,
+          user: {
+            id: response.user.id,
+            username: response.user.username,
+            is_active: response.user.is_active,
+            roles: [] // Will be populated by fetchUser
+          },
+          accessToken: response.access_token,
+          refreshToken: response.refresh_token,
           isAuthenticated: true,
+          isSuperAdmin: false,
           isLoading: false,
           error: null
         }));
@@ -75,17 +80,23 @@ function createAuthStore() {
       update((state) => ({ ...state, isLoading: true }));
 
       try {
-        const user = await api.get<UserInfo>('/auth/me');
+        const profile = await api.get<ProfileResponse>('/auth/me');
 
         update((state) => ({
           ...state,
-          user,
+          user: {
+            id: profile.user_id,
+            username: profile.username,
+            is_active: true, // Assuming active if they can call /auth/me
+            roles: profile.roles
+          },
           isAuthenticated: true,
+          isSuperAdmin: profile.roles.some(r => r.toLowerCase() === 'superadmin'),
           isLoading: false,
           error: null
         }));
 
-        return user;
+        return profile;
       } catch (error) {
         const apiError = error as ApiError;
         clearTokens();
@@ -138,7 +149,7 @@ export const isAuthenticated = derived(authStore, ($auth) => $auth.isAuthenticat
 
 export const isSuperAdmin = derived(authStore, ($auth) => {
   if (!$auth.user || !$auth.user.roles) return false;
-  return $auth.user.roles.some((role) => role.toLowerCase() === 'superadmin');
+  return $auth.user.roles.some((role: string) => role.toLowerCase() === 'superadmin');
 });
 
 export const isLoading = derived(authStore, ($auth) => $auth.isLoading);

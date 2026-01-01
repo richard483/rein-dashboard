@@ -4,8 +4,8 @@ import type {
   CreateUserRequest,
   UpdateUserRequest,
   PaginatedResponse,
-  UserRole,
-  UserPermission,
+  Role,
+  Permission,
   ApiError
 } from '$lib/modules/shared/types';
 import * as userApi from '../api/userApi';
@@ -22,8 +22,8 @@ interface UserListState {
 
 interface UserDetailState {
   user: User | null;
-  roles: UserRole[];
-  permissions: UserPermission[];
+  roles: Role[];
+  permissions: Permission[];
   loading: boolean;
   error: ApiError | null;
 }
@@ -64,11 +64,11 @@ function createUserListStore() {
 
         update((state) => ({
           ...state,
-          users: response.items,
-          currentPage: response.pagination.page,
-          totalPages: response.pagination.total_pages,
-          totalItems: response.pagination.total_items,
-          pageSize: response.pagination.page_size,
+          users: response.users,
+          currentPage: response.page,
+          totalPages: response.total_pages,
+          totalItems: response.total,
+          pageSize: response.page_size,
           loading: false
         }));
       } catch (error) {
@@ -97,7 +97,7 @@ function createUserListStore() {
         // Remove from local state
         update((state) => ({
           ...state,
-          users: state.users.filter((u) => u.id !== id)
+          users: state.users.filter((u) => u.ID !== id)
         }));
       } catch (error) {
         throw error;
@@ -166,9 +166,9 @@ function createUserDetailStore() {
     // Fetch user roles
     fetchUserRoles: async (userId: string) => {
       try {
-        const roles = await userApi.getUserRoles(userId);
-        update((state) => ({ ...state, roles }));
-        return roles;
+        const response = await userApi.getUserRoles(userId);
+        update((state) => ({ ...state, roles: response.roles }));
+        return response.roles;
       } catch (error) {
         throw error;
       }
@@ -199,9 +199,9 @@ function createUserDetailStore() {
     // Fetch user permissions
     fetchUserPermissions: async (userId: string) => {
       try {
-        const permissions = await userApi.getUserPermissions(userId);
-        update((state) => ({ ...state, permissions }));
-        return permissions;
+        const response = await userApi.getUserPermissions(userId);
+        update((state) => ({ ...state, permissions: response.permissions }));
+        return response.permissions;
       } catch (error) {
         throw error;
       }

@@ -1,14 +1,13 @@
 import { api } from '$lib/modules/shared/api/client';
-import type { Permission, CreatePermissionRequest, ApiResponse } from '$lib/modules/shared/types';
+import type { Permission, CreatePermissionRequest, ApiResponse, ListPermissionsResponse } from '$lib/modules/shared/types';
 
 /**
  * Permission Management API Service
  */
 
 // List all permissions
-export async function listPermissions(): Promise<Permission[]> {
-  const response = await api.get<ApiResponse>('/admin/permissions');
-  return response.data as Permission[];
+export async function listPermissions(): Promise<ListPermissionsResponse> {
+  return api.get<ListPermissionsResponse>('/admin/permissions');
 }
 
 // Create a new permission

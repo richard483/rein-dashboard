@@ -4,7 +4,8 @@ import type {
   CreateRoleRequest,
   UpdateRoleRequest,
   AssignPermissionsRequest,
-  ApiResponse
+  ApiResponse,
+  ListRolesResponse
 } from '$lib/modules/shared/types';
 
 /**
@@ -12,15 +13,13 @@ import type {
  */
 
 // List all roles
-export async function listRoles(): Promise<Role[]> {
-  const response = await api.get<ApiResponse>('/admin/roles');
-  return response.data as Role[];
+export async function listRoles(): Promise<ListRolesResponse> {
+  return api.get<ListRolesResponse>('/admin/roles');
 }
 
 // Get role by ID
 export async function getRoleById(id: string): Promise<Role> {
-  const response = await api.get<ApiResponse>(`/admin/roles/${id}`);
-  return response.data as Role;
+  return api.get<Role>(`/admin/roles/${id}`);
 }
 
 // Create a new role

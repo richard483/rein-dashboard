@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { UserPermission } from '$lib/modules/shared/types';
+	import type { Permission } from '$lib/modules/shared/types';
 	import Spinner from '$lib/modules/shared/components/Spinner.svelte';
 
 	interface Props {
-		permissions: UserPermission[];
+		permissions: Permission[];
 		loading?: boolean;
 	}
 
@@ -19,7 +19,7 @@
 				acc[perm.resource].push(perm);
 				return acc;
 			},
-			{} as Record<string, UserPermission[]>
+			{} as Record<string, Permission[]>
 		)
 	);
 </script>
@@ -37,12 +37,9 @@
 					<div class="permission-list">
 						{#each perms as perm}
 							<div class="permission-item">
-								<span class="permission-action">{perm.action}</span>
-								{#if perm.description}
-									<span class="text-muted">{perm.description}</span>
-								{/if}
-								{#if perm.source_role}
-									<span class="source-role">via {perm.source_role}</span>
+							<span class="permission-key">{perm.permission_key}</span>
+							{#if perm.description}
+								<span class="text-muted">{perm.description}</span>
 								{/if}
 							</div>
 						{/each}
@@ -94,18 +91,12 @@
 		font-size: 0.875rem;
 	}
 
-	.permission-action {
+	.permission-key {
 		font-weight: 600;
 		padding: 0.25rem 0.5rem;
 		background: #fff;
 		border: 1px solid #ddd;
 		border-radius: 4px;
-	}
-
-	.source-role {
-		margin-left: auto;
-		font-size: 0.75rem;
-		color: #666;
-		font-style: italic;
+		font-family: 'Courier New', monospace;
 	}
 </style>

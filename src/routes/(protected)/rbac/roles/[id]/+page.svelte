@@ -62,7 +62,7 @@
 			<Spinner />
 		</div>
 	{:else if $roleStore.currentRole}
-		{#if $roleStore.currentRole.is_system}
+		{#if $roleStore.currentRole.is_system_role}
 			<div class="card">
 				<p class="text-error">System roles cannot be edited.</p>
 				<Button onclick={() => goto('/rbac/roles')} variant="secondary">Back to Roles</Button>

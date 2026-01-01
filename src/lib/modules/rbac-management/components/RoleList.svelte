@@ -21,7 +21,7 @@
 			</td>
 			<td>{role.description || '-'}</td>
 			<td>
-				{#if role.is_system}
+				{#if role.is_system_role}
 					<span class="badge badge-system">System</span>
 				{:else}
 					<span class="badge badge-custom">Custom</span>
@@ -34,10 +34,10 @@
 						Permissions
 					</button>
 				{/if}
-				{#if onEdit && !role.is_system}
+				{#if onEdit && !role.is_system_role}
 					<button class="btn-action" onclick={() => onEdit(role)}>Edit</button>
 				{/if}
-				{#if onDelete && !role.is_system}
+			{#if onDelete && !role.is_system_role}
 					<button class="btn-action btn-danger" onclick={() => onDelete(role)}>Delete</button>
 				{/if}
 			</td>

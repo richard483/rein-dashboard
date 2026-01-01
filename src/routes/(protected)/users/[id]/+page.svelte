@@ -65,8 +65,8 @@
 		<div class="card">
 			<UserForm
 				initialData={{
-					user_name: $userDetailStore.user.username,
-					is_active: $userDetailStore.user.is_active
+					user_name: $userDetailStore.user.UserName,
+					is_active: $userDetailStore.user.IsActive
 				}}
 				isEdit={true}
 				onSubmit={handleSubmit}

@@ -16,14 +16,14 @@
 <Table headers={['Username', 'Status', 'Created At']} data={users} {loading} actions={true}>
 	{#each users as user}
 		<tr>
-			<td>{user.username}</td>
+			<td>{user.UserName}</td>
 			<td>
-				<span class="status-badge" class:active={user.is_active}>
-					{user.is_active ? 'Active' : 'Inactive'}
+				<span class="status-badge" class:active={user.IsActive}>
+					{user.IsActive ? 'Active' : 'Inactive'}
 				</span>
 			</td>
 			<td>
-				{user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
+				{user.CreatedAt ? new Date(user.CreatedAt).toLocaleDateString() : '-'}
 			</td>
 			<td class="actions">
 				{#if onEdit}

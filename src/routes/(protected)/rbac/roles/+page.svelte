@@ -36,7 +36,7 @@
 	}
 
 	function handleDeleteClick(role: Role) {
-		if (role.is_system) {
+		if (role.is_system_role) {
 			showToast('Cannot delete system roles', 'error');
 			return;
 		}

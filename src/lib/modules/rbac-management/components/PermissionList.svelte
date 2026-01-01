@@ -35,17 +35,15 @@
 			<div class="resource-group">
 				<h3>{resource}</h3>
 				<Table
-					headers={['Action', 'Description', 'Created At']}
+					headers={['Permission Key', 'Action', 'Description']}
 					data={perms}
 					actions={!!onDelete}
 				>
 					{#each perms as perm}
 						<tr>
-							<td><strong>{perm.action}</strong></td>
+							<td><strong>{perm.permission_key}</strong></td>
+							<td>{perm.action}</td>
 							<td>{perm.description || '-'}</td>
-							<td>
-								{perm.created_at ? new Date(perm.created_at).toLocaleDateString() : '-'}
-							</td>
 							{#if onDelete}
 								<td class="actions">
 									<button class="btn-action btn-danger" onclick={() => onDelete(perm)}>

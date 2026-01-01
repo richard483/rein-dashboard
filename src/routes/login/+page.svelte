@@ -22,7 +22,7 @@
 		try {
 			await authStore.login({
 				user_name: username,
-				pass_phrase: password
+				password: password
 			});
 
 			showToast('Login successful', 'success');

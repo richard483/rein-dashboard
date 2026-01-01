@@ -61,7 +61,7 @@
 			{#if $roleStore.currentRole.description}
 				<p class="text-muted">{$roleStore.currentRole.description}</p>
 			{/if}
-			{#if $roleStore.currentRole.is_system}
+			{#if $roleStore.currentRole.is_system_role}
 				<p class="text-muted"><strong>Note:</strong> This is a system role</p>
 			{/if}
 		</div>
