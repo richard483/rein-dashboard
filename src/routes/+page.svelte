@@ -1,23 +1,28 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { isAuthenticated, currentUser, isSuperAdmin } from '$lib/modules/shared/auth';
+	import { isAuthenticated, currentUser, isSuperAdmin, isLoading } from '$lib/modules/shared/auth';
 	import { roleStore, permissionStore } from '$lib/modules/rbac-management';
 	import { userListStore } from '$lib/modules/user-management/stores';
-	import { onMount } from 'svelte';
 	import Spinner from '$lib/modules/shared/components/Spinner.svelte';
 
 	let loading = $state(false);
+	let statsLoaded = $state(false);
 	let stats = $state({
 		totalUsers: 0,
 		totalRoles: 0,
 		totalPermissions: 0
 	});
 
-	onMount(() => {
-		if (!$isAuthenticated) {
-			goto('/login');
-		} else if ($isSuperAdmin) {
-			loadStats();
+	// Use $effect to reactively respond to auth state changes
+	$effect(() => {
+		// Wait for auth to finish loading
+		if (!$isLoading) {
+			if (!$isAuthenticated) {
+				goto('/login');
+			} else if ($isSuperAdmin && !statsLoaded) {
+				statsLoaded = true;
+				loadStats();
+			}
 		}
 	});
 
@@ -47,7 +52,12 @@
 <div class="home">
 	<h1>Welcome to Rein Management</h1>
 
-	{#if $currentUser}
+	{#if $isLoading}
+		<div class="loading-container">
+			<Spinner />
+			<p class="text-muted">Loading...</p>
+		</div>
+	{:else if $currentUser}
 		<p class="text-muted">Logged in as: <strong>{$currentUser.username}</strong></p>
 
 		{#if $isSuperAdmin}

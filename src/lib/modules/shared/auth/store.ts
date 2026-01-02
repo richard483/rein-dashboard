@@ -16,6 +16,48 @@ const initialState: AuthState = {
 function createAuthStore() {
   const { subscribe, set, update } = writable<AuthState>(initialState);
 
+  // Define fetchUser first so we can reference it in init
+  const fetchUser = async () => {
+    const token = getAccessToken();
+    if (!token) {
+      set(initialState);
+      return null;
+    }
+
+    update((state) => ({ ...state, isLoading: true }));
+
+    try {
+      const profile = await api.get<ProfileResponse>('/auth/me');
+
+      update((state) => ({
+        ...state,
+        user: {
+          id: profile.user_id,
+          username: profile.username,
+          is_active: true, // Assuming active if they can call /auth/me
+          roles: profile.roles
+        },
+        isAuthenticated: true,
+        isSuperAdmin: profile.roles.some(r => r.toLowerCase() === 'superadmin'),
+        isLoading: false,
+        error: null
+      }));
+
+      return profile;
+    } catch (error) {
+      const apiError = error as ApiError;
+      clearTokens();
+      update((state) => ({
+        ...state,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: apiError
+      }));
+      return null;
+    }
+  };
+
   return {
     subscribe,
 
@@ -70,46 +112,7 @@ function createAuthStore() {
     },
 
     // Get current user profile
-    fetchUser: async () => {
-      const token = getAccessToken();
-      if (!token) {
-        set(initialState);
-        return null;
-      }
-
-      update((state) => ({ ...state, isLoading: true }));
-
-      try {
-        const profile = await api.get<ProfileResponse>('/auth/me');
-
-        update((state) => ({
-          ...state,
-          user: {
-            id: profile.user_id,
-            username: profile.username,
-            is_active: true, // Assuming active if they can call /auth/me
-            roles: profile.roles
-          },
-          isAuthenticated: true,
-          isSuperAdmin: profile.roles.some(r => r.toLowerCase() === 'superadmin'),
-          isLoading: false,
-          error: null
-        }));
-
-        return profile;
-      } catch (error) {
-        const apiError = error as ApiError;
-        clearTokens();
-        update((state) => ({
-          ...state,
-          user: null,
-          isAuthenticated: false,
-          isLoading: false,
-          error: apiError
-        }));
-        return null;
-      }
-    },
+    fetchUser,
 
     // Initialize auth state (check if user is logged in)
     init: async () => {
@@ -119,18 +122,8 @@ function createAuthStore() {
         return;
       }
 
-      try {
-        const user = await api.get<UserInfo>('/auth/me');
-        update((state) => ({
-          ...state,
-          user,
-          isAuthenticated: true,
-          isLoading: false
-        }));
-      } catch (error) {
-        clearTokens();
-        set(initialState);
-      }
+      // Use fetchUser to properly initialize with roles and permissions
+      await fetchUser();
     },
 
     // Clear error
