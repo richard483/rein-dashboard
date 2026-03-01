@@ -34,6 +34,8 @@ function createAuthStore() {
         user: {
           id: profile.user_id,
           username: profile.username,
+          email: profile.email,
+          email_verified: profile.email_verified,
           is_active: true, // Assuming active if they can call /auth/me
           roles: profile.roles
         },
@@ -75,6 +77,8 @@ function createAuthStore() {
           user: {
             id: response.user.id,
             username: response.user.username,
+            email: response.user.email,
+            email_verified: response.user.email_verified,
             is_active: response.user.is_active,
             roles: [] // Will be populated by fetchUser
           },
@@ -86,6 +90,114 @@ function createAuthStore() {
           error: null
         }));
 
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Register
+    register: async (data: { user_name: string; password: string; confirm_password: string; email: string }) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ApiResponse<{ user_id: string; username: string; email: string; message: string }>>('/auth/register', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Forgot Password
+    forgotPassword: async (email: string) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', { email });
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Reset Password
+    resetPassword: async (token: string, newPassword: string) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ApiResponse<{ message: string; password_reset: boolean }>>('/auth/reset-password', { 
+          token, 
+          new_password: newPassword 
+        });
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Verify Email
+    verifyEmail: async (token: string) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ApiResponse<{ message: string; email_verified: boolean }>>('/auth/verify-email', { token });
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Resend Verification
+    resendVerification: async (email: string) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ApiResponse<{ message: string }>>('/auth/resend-verification', { email });
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
         return response;
       } catch (error) {
         const apiError = error as ApiError;
