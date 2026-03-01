@@ -156,7 +156,7 @@ function createAuthStore() {
       try {
         const response = await api.post<ApiResponse<{ message: string; password_reset: boolean }>>('/auth/reset-password', { 
           token, 
-          new_password: newPassword 
+          password: newPassword, confirm_password: newPassword 
         });
         
         update((state) => ({ ...state, isLoading: false, error: null }));
