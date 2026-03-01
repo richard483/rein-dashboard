@@ -14,6 +14,12 @@
 	let loading = $state(false);
 	let successMessage = $state('');
 
+	function getPasswordResetRedirectUrl() {
+		const redirectUrl = new URL('/reset-password', window.location.origin);
+		redirectUrl.searchParams.delete('token');
+		return redirectUrl.toString();
+	}
+
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 		successMessage = '';
@@ -46,7 +52,7 @@
 					successMessage = '';
 				}, 3000);
 			} else if (mode === 'forgot-password') {
-				await authStore.forgotPassword(email);
+				await authStore.forgotPassword(email, getPasswordResetRedirectUrl());
 				successMessage = 'If an account exists with this email, you will receive a password reset link.';
 			} else if (mode === 'reset-password') {
 				await authStore.resetPassword(resetToken, password);

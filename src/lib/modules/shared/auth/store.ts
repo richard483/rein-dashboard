@@ -124,11 +124,16 @@ function createAuthStore() {
     },
 
     // Forgot Password
-    forgotPassword: async (email: string) => {
+    forgotPassword: async (email: string, redirectUrl?: string) => {
       update((state) => ({ ...state, isLoading: true, error: null }));
 
       try {
-        const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', { email });
+        const payload: { email: string; redirect_url?: string } = { email };
+        if (redirectUrl) {
+          payload.redirect_url = redirectUrl;
+        }
+
+        const response = await api.post<ApiResponse<{ message: string }>>('/auth/forgot-password', payload);
         
         update((state) => ({ ...state, isLoading: false, error: null }));
         
