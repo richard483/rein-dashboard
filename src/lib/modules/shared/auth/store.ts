@@ -267,14 +267,14 @@ export const isLoading = derived(authStore, ($auth) => $auth.isLoading);
 export const authError = derived(authStore, ($auth) => $auth.error);
 
     // Change password
-    changePassword: async (currentPassword: string, newPassword: string) => {
+    changePassword: async (currentPassword: string, newPassword: string, confirmPassword: string) => {
       update((state) => ({ ...state, isLoading: true, error: null }));
 
       try {
         const response = await api.post<ApiResponse<{ message: string }>>('/auth/change-password', {
           current_password: currentPassword,
           new_password: newPassword,
-          confirm_new_password: newPassword
+          confirm_new_password: confirmPassword
         });
         
         update((state) => ({ ...state, isLoading: false, error: null }));
