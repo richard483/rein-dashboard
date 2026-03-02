@@ -5,7 +5,7 @@
 	import Input from '$lib/modules/shared/components/Input.svelte';
 	import Button from '$lib/modules/shared/components/Button.svelte';
 
-	let mode: 'login' | 'register' | 'forgot-password' | 'reset-password' = $state('login');
+	let mode: 'login' | 'register' | 'forgot-password' | 'reset-password' | 'resend-verification' = $state('login');
 	let username = $state('');
 	let password = $state('');
 	let confirmPassword = $state('');
@@ -61,6 +61,9 @@
 					mode = 'login';
 					successMessage = '';
 				}, 3000);
+			} else if (mode === 'resend-verification') {
+				await authStore.resendVerification(email);
+				successMessage = 'If your email is registered and not verified, you will receive a verification link.';
 			}
 		} catch (error: any) {
 			showToast(error.message || 'An error occurred', 'error');
@@ -86,6 +89,8 @@
 				Reset Password
 			{:else if mode === 'reset-password'}
 				New Password
+			{:else if mode === 'resend-verification'}
+				Resend Verification
 			{/if}
 		</h1>
 		<p class="text-muted mb-3">
@@ -97,11 +102,13 @@
 				Enter your email to reset password
 			{:else if mode === 'reset-password'}
 				Enter your reset token and new password
+			{:else if mode === 'resend-verification'}
+				Enter your email to resend verification link
 			{/if}
 		</p>
 
 		<form onsubmit={handleSubmit}>
-			{#if mode === 'register' || mode === 'forgot-password'}
+			{#if mode === 'register' || mode === 'forgot-password' || mode === 'resend-verification'}
 				<Input
 					label="Email"
 					type="email"
@@ -121,7 +128,7 @@
 				/>
 			{/if}
 
-			{#if mode !== 'forgot-password' && mode !== 'reset-password'}
+			{#if mode !== 'forgot-password' && mode !== 'reset-password' && mode !== 'resend-verification'}
 				<Input
 					label="Username"
 					type="text"
@@ -131,7 +138,7 @@
 				/>
 			{/if}
 
-			{#if mode !== 'forgot-password'}
+			{#if mode !== 'forgot-password' && mode !== 'resend-verification'}
 				<Input
 					label="Password"
 					type="password"
@@ -164,6 +171,8 @@
 					{loading ? 'Sending...' : 'Send Reset Link'}
 				{:else if mode === 'reset-password'}
 					{loading ? 'Resetting...' : 'Reset Password'}
+				{:else if mode === 'resend-verification'}
+					{loading ? 'Sending...' : 'Send Verification'}
 				{/if}
 			</Button>
 		</form>
@@ -176,6 +185,9 @@
 				</p>
 				<p>
 					<button type="button" class="link-btn" onclick={() => switchMode('forgot-password')}>Forgot Password?</button>
+				</p>
+				<p>
+					<button type="button" class="link-btn" onclick={() => switchMode('resend-verification')}>Resend Verification?</button>
 				</p>
 			{:else if mode === 'register'}
 				<p>

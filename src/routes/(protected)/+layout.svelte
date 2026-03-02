@@ -11,6 +11,7 @@
 	}
 
 	let { children }: Props = $props();
+	let showDropdown = $state(false);
 
 	const currentPath = $derived(page.url.pathname);
 
@@ -72,8 +73,17 @@
 					</nav>
 
 					<div class="user-menu">
-						<span class="user-name">{$currentUser.username}</span>
-						<button class="btn-logout" onclick={handleLogout}>Logout</button>
+						<button class="user-btn" onclick={() => showDropdown = !showDropdown}>
+							{$currentUser.username} ▼
+						</button>
+						
+						{#if showDropdown}
+							<div class="dropdown">
+								<a href="/sessions" class="dropdown-item">Sessions</a>
+								<a href="/change-password" class="dropdown-item">Change Password</a>
+								<button class="dropdown-item" onclick={handleLogout}>Logout</button>
+							</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
@@ -142,17 +152,10 @@
 	}
 
 	.user-menu {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
+		position: relative;
 	}
 
-	.user-name {
-		font-size: 0.875rem;
-		color: #666;
-	}
-
-	.btn-logout {
+	.user-btn {
 		padding: 0.375rem 0.75rem;
 		border: 1px solid #ddd;
 		background: #fff;
@@ -161,7 +164,37 @@
 		border-radius: 4px;
 	}
 
-	.btn-logout:hover {
+	.user-btn:hover {
+		background: #f5f5f5;
+	}
+
+	.dropdown {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		margin-top: 0.25rem;
+		background: #fff;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		min-width: 160px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		z-index: 100;
+	}
+
+	.dropdown-item {
+		display: block;
+		width: 100%;
+		padding: 0.5rem 1rem;
+		text-align: left;
+		text-decoration: none;
+		color: #333;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-size: 0.875rem;
+	}
+
+	.dropdown-item:hover {
 		background: #f5f5f5;
 	}
 

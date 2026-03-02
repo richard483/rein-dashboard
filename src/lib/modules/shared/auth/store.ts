@@ -265,3 +265,61 @@ export const isSuperAdmin = derived(authStore, ($auth) => {
 export const isLoading = derived(authStore, ($auth) => $auth.isLoading);
 
 export const authError = derived(authStore, ($auth) => $auth.error);
+
+    // Change password
+    changePassword: async (currentPassword: string, newPassword: string) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ApiResponse<{ message: string }>>('/auth/change-password', {
+          current_password: currentPassword,
+          new_password: newPassword,
+          confirm_new_password: newPassword
+        });
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Get sessions
+    getSessions: async () => {
+      try {
+        const response = await api.get<ApiResponse<{ sessions: any[]; count: number }>>('/auth/sessions');
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        throw apiError;
+      }
+    },
+
+    // Logout from specific session
+    logoutSession: async (sessionId: string) => {
+      try {
+        const response = await api.delete<ApiResponse<{ message: string }>>(`/auth/sessions/${sessionId}`);
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        throw apiError;
+      }
+    },
+
+    // Logout from all sessions
+    logoutAll: async () => {
+      try {
+        const response = await api.post<ApiResponse<{ message: string }>>('/auth/logout/all', {});
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        throw apiError;
+      }
+    },
