@@ -61,6 +61,16 @@
 				{loading ? 'Logging in...' : 'Login'}
 			</Button>
 		</form>
+
+		<div class="mt-3 text-center">
+			<p class="text-muted">
+				Don't have an account? 
+				<a href="/register">Sign up</a>
+			</p>
+			<p class="text-muted mt-2">
+				<a href="/forgot-password">Forgot your password?</a>
+			</p>
+		</div>
 	</div>
 </div>
 

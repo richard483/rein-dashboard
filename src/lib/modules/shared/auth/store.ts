@@ -1,6 +1,26 @@
 import { writable, derived } from 'svelte/store';
-import type { UserInfo, LoginRequest, LoginResponse, ApiError, AuthState, ProfileResponse, ApiResponse } from '../types';
-import { api, setTokens, clearTokens, getAccessToken } from '../api/client';
+import type { 
+  UserInfo, 
+  LoginRequest, 
+  LoginResponse, 
+  ApiError, 
+  AuthState, 
+  ProfileResponse, 
+  ApiResponse,
+  RegisterRequest,
+  RegisterResponse,
+  VerifyEmailRequest,
+  VerifyEmailResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse
+} from '../types';
+import { api, setTokens, clearTokens, getAccessToken, getRefreshToken } from '../api/client';
 
 
 const initialState: AuthState = {
@@ -129,6 +149,132 @@ function createAuthStore() {
     // Clear error
     clearError: () => {
       update((state) => ({ ...state, error: null }));
+    },
+
+    // Register new user
+    register: async (data: RegisterRequest) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<RegisterResponse>('/auth/register', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Verify email
+    verifyEmail: async (data: VerifyEmailRequest) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<VerifyEmailResponse>('/auth/verify-email', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Resend verification email
+    resendVerification: async (data: ResendVerificationRequest) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ResendVerificationResponse>('/auth/resend-verification', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Forgot password
+    forgotPassword: async (data: ForgotPasswordRequest) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ForgotPasswordResponse>('/auth/forgot-password', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Reset password
+    resetPassword: async (data: ResetPasswordRequest) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ResetPasswordResponse>('/auth/reset-password', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
+    },
+
+    // Change password (requires authentication)
+    changePassword: async (data: ChangePasswordRequest) => {
+      update((state) => ({ ...state, isLoading: true, error: null }));
+
+      try {
+        const response = await api.post<ChangePasswordResponse>('/auth/change-password', data);
+        
+        update((state) => ({ ...state, isLoading: false, error: null }));
+        
+        return response;
+      } catch (error) {
+        const apiError = error as ApiError;
+        update((state) => ({
+          ...state,
+          isLoading: false,
+          error: apiError
+        }));
+        throw apiError;
+      }
     }
   };
 }
