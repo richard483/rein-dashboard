@@ -3,7 +3,7 @@
 	import { authStore, authError } from '$lib/modules/shared/auth';
 	import { showToast } from '$lib/modules/shared/components';
 	import { setTokens, getAccessToken } from '$lib/modules/shared/api/client';
-	import { env } from '$env/dynamic-public';
+	import { env } from '$env/dynamic/public';
 	import Input from '$lib/modules/shared/components/Input.svelte';
 	import Button from '$lib/modules/shared/components/Button.svelte';
 
