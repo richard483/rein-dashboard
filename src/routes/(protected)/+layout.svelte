@@ -73,6 +73,7 @@
 
 					<div class="user-menu">
 						<span class="user-name">{$currentUser.username}</span>
+						<a href="/change-password" class="btn-link">Change Password</a>
 						<button class="btn-logout" onclick={handleLogout}>Logout</button>
 					</div>
 				{/if}

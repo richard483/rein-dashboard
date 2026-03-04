@@ -212,6 +212,67 @@ export interface LogoutRequest {
   refresh_token: string;
 }
 
+// Register Request
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface RegisterResponse {
+  message: string;
+  user_id: string;
+}
+
+// Email Verification
+export interface VerifyEmailRequest {
+  email: string;
+  verification_code: string;
+}
+
+export interface VerifyEmailResponse {
+  message: string;
+  is_verified: boolean;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+export interface ResendVerificationResponse {
+  message: string;
+}
+
+// Forgot Password
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+// Reset Password
+export interface ResetPasswordRequest {
+  email: string;
+  verification_code: string;
+  new_password: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
+// Change Password (protected)
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
+}
+
 // Error Types
 export interface ApiError {
   status: number;

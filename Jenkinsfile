@@ -17,4 +17,7 @@ KubePipeline() {
 	appPort = "5173"
   externalEndpointsIp = "10.10.10.15"
 	kubeNodePort = "30015"
+  buildArgs = [
+      PUBLIC_API_BASE_URL: "http://222.222.1.104:30025"
+  ]
 }
