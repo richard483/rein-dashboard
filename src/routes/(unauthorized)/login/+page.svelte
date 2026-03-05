@@ -62,7 +62,8 @@
 					return;
 				}
 
-				const data = event.data;
+				const response = event.data;
+				const data = response.data || response;
 				
 				if (data.access_token) {
 					// Set tokens
@@ -70,8 +71,8 @@
 					showToast('Login successful', 'success');
 					popup.close();
 					goto('/');
-				} else if (data.error) {
-					showToast(data.message || 'OAuth login failed', 'error');
+				} else if (data.error || response.error) {
+					showToast(data.message || response.message || 'OAuth login failed', 'error');
 					popup.close();
 				}
 			};
