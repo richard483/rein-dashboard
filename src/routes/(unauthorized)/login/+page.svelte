@@ -58,7 +58,9 @@
 			// Listen for OAuth callback message
 			const receiveMessage = (event: MessageEvent) => {
 				// Verify origin
-				if (!event.origin.startsWith(API_BASE_URL)) {
+				// Accept messages from both internal IP and domain
+				const allowedOrigins = [API_BASE_URL, 'https://auth.nephren.xyz'];
+				if (!allowedOrigins.some(o => event.origin.startsWith(o))) {
 					return;
 				}
 
