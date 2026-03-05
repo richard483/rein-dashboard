@@ -3,7 +3,7 @@
 	import { authStore, authError } from '$lib/modules/shared/auth';
 	import { showToast } from '$lib/modules/shared/components';
 	import { setTokens, getAccessToken } from '$lib/modules/shared/api/client';
-	import { env } from '$env/dynamic-public';
+	import { env } from '$env/dynamic/public';
 	import Input from '$lib/modules/shared/components/Input.svelte';
 	import Button from '$lib/modules/shared/components/Button.svelte';
 
@@ -62,16 +62,22 @@
 					return;
 				}
 
-				const data = event.data;
+				// Guard against null/undefined data
+				if (!event.data) {
+					return;
+				}
+
+				const response = event.data;
+				const data = response.data || response;
 				
-				if (data.access_token) {
+				if (data && data.access_token) {
 					// Set tokens
 					setTokens(data.access_token, data.refresh_token);
 					showToast('Login successful', 'success');
 					popup.close();
 					goto('/');
-				} else if (data.error) {
-					showToast(data.message || 'OAuth login failed', 'error');
+				} else if ((data && data.error) || (response && response.error)) {
+					showToast(data.message || response.message || 'OAuth login failed', 'error');
 					popup.close();
 				}
 			};
