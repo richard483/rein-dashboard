@@ -33,9 +33,10 @@
 
 		try {
 			await authStore.register({
-				username,
+				user_name: username,
 				email,
-				password
+				password,
+				confirm_password: confirmPassword
 			});
 
 			showToast('Registration successful! Please check your email to verify your account.', 'success');

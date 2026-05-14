@@ -1,6 +1,6 @@
 <script lang="ts">
 	interface Props {
-		variant?: 'primary' | 'secondary' | 'danger';
+		variant?: 'primary' | 'secondary' | 'outline' | 'danger';
 		type?: 'button' | 'submit' | 'reset';
 		disabled?: boolean;
 		loading?: boolean;
@@ -60,6 +60,16 @@
 
 	.btn-primary:hover:not(:disabled) {
 		background: #555;
+	}
+
+	.btn-outline {
+		background: #fff;
+		color: #333;
+		border-color: #ccc;
+	}
+
+	.btn-outline:hover:not(:disabled) {
+		background: #f5f5f5;
 	}
 
 	.btn-danger {

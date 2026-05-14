@@ -6,6 +6,7 @@
 	import Button from '$lib/modules/shared/components/Button.svelte';
 
 	let email = $state('');
+	let redirectUrl = $state('');
 	let loading = $state(false);
 	let emailSent = $state(false);
 
@@ -20,7 +21,8 @@
 		loading = true;
 
 		try {
-			await authStore.forgotPassword({ email });
+			const resetUrl = redirectUrl || `${window.location.origin}/reset-password`;
+			await authStore.forgotPassword({ email, redirect_url: resetUrl });
 			emailSent = true;
 			showToast('If an account exists with this email, you will receive a password reset link.', 'success');
 		} catch (error: any) {
@@ -51,6 +53,13 @@
 					bind:value={email}
 					placeholder="Enter your registered email"
 					required
+				/>
+
+				<Input
+					label="Reset Redirect URL"
+					type="text"
+					bind:value={redirectUrl}
+					placeholder="Defaults to this dashboard reset page"
 				/>
 
 				<Button type="submit" variant="primary" {loading}>

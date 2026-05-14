@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authStore, requireAuth } from '$lib/modules/shared/auth';
+	import { authStore } from '$lib/modules/shared/auth';
 	import { showToast } from '$lib/modules/shared/components';
 	import Input from '$lib/modules/shared/components/Input.svelte';
 	import Button from '$lib/modules/shared/components/Button.svelte';
@@ -9,9 +9,6 @@
 	let confirmPassword = $state('');
 	let loading = $state(false);
 	let success = $state(false);
-
-	// Protect this route - only authenticated users can access
-	requireAuth();
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
@@ -41,7 +38,8 @@
 		try {
 			await authStore.changePassword({
 				current_password: currentPassword,
-				new_password: newPassword
+				new_password: newPassword,
+				confirm_new_password: confirmPassword
 			});
 
 			success = true;

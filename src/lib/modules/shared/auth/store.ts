@@ -29,8 +29,15 @@ const initialState: AuthState = {
   refreshToken: null,
   isAuthenticated: false,
   isSuperAdmin: false,
-  isLoading: false,
+  isInitialized: false,
+  isLoading: true,
   error: null
+};
+
+const unauthenticatedState: AuthState = {
+  ...initialState,
+  isInitialized: true,
+  isLoading: false
 };
 
 function createAuthStore() {
@@ -40,7 +47,7 @@ function createAuthStore() {
   const fetchUser = async () => {
     const token = getAccessToken();
     if (!token) {
-      set(initialState);
+      set(unauthenticatedState);
       return null;
     }
 
@@ -59,6 +66,7 @@ function createAuthStore() {
         },
         isAuthenticated: true,
         isSuperAdmin: profile.roles.some(r => r.toLowerCase() === 'superadmin'),
+        isInitialized: true,
         isLoading: false,
         error: null
       }));
@@ -71,6 +79,8 @@ function createAuthStore() {
         ...state,
         user: null,
         isAuthenticated: false,
+        isSuperAdmin: false,
+        isInitialized: true,
         isLoading: false,
         error: apiError
       }));
@@ -102,9 +112,12 @@ function createAuthStore() {
           refreshToken: response.refresh_token,
           isAuthenticated: true,
           isSuperAdmin: false,
-          isLoading: false,
+          isInitialized: true,
+          isLoading: true,
           error: null
         }));
+
+        await fetchUser();
 
         return response;
       } catch (error) {
@@ -112,6 +125,7 @@ function createAuthStore() {
         update((state) => ({
           ...state,
           isLoading: false,
+          isInitialized: true,
           error: apiError
         }));
         throw apiError;
@@ -121,13 +135,15 @@ function createAuthStore() {
     // Logout
     logout: async () => {
       try {
-        // Optional: call logout endpoint if needed
-        // await api.post('/auth/logout', { refresh_token: getRefreshToken() });
+        const refreshToken = getRefreshToken();
+        if (refreshToken) {
+          await api.post('/auth/logout', { refresh_token: refreshToken });
+        }
       } catch (error) {
         console.error('Logout error:', error);
       } finally {
         clearTokens();
-        set(initialState);
+        set(unauthenticatedState);
       }
     },
 
@@ -138,7 +154,7 @@ function createAuthStore() {
     init: async () => {
       const token = getAccessToken();
       if (!token) {
-        set(initialState);
+        set(unauthenticatedState);
         return;
       }
 
@@ -292,5 +308,7 @@ export const isSuperAdmin = derived(authStore, ($auth) => {
 });
 
 export const isLoading = derived(authStore, ($auth) => $auth.isLoading);
+
+export const isInitialized = derived(authStore, ($auth) => $auth.isInitialized);
 
 export const authError = derived(authStore, ($auth) => $auth.error);
