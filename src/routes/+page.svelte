@@ -3,6 +3,7 @@
 	import { isAuthenticated, currentUser, isSuperAdmin, isLoading } from '$lib/modules/shared/auth';
 	import { roleStore, permissionStore } from '$lib/modules/rbac-management';
 	import { userListStore } from '$lib/modules/user-management/stores';
+	import { listOAuthClients } from '$lib/modules/karasu';
 	import Spinner from '$lib/modules/shared/components/Spinner.svelte';
 
 	let loading = $state(false);
@@ -10,7 +11,8 @@
 	let stats = $state({
 		totalUsers: 0,
 		totalRoles: 0,
-		totalPermissions: 0
+		totalPermissions: 0,
+		totalClients: 0
 	});
 
 	// Use $effect to reactively respond to auth state changes
@@ -30,16 +32,18 @@
 		loading = true;
 		try {
 			// Fetch data in parallel
-			const [, roles, permissions] = await Promise.all([
+			const [, roles, permissions, clients] = await Promise.all([
 				userListStore.fetchUsers(1, 10), // Get first page
 				roleStore.fetchRoles(),
-				permissionStore.fetchPermissions()
+				permissionStore.fetchPermissions(),
+				listOAuthClients()
 			]);
 
 			stats = {
 				totalUsers: $userListStore.totalItems,
 				totalRoles: roles.length,
-				totalPermissions: permissions.length
+				totalPermissions: permissions.length,
+				totalClients: clients.count
 			};
 		} catch (error) {
 			console.error('Failed to load stats:', error);
@@ -81,6 +85,10 @@
 							<div class="stat-value">{stats.totalPermissions}</div>
 							<div class="stat-label">Permissions</div>
 						</div>
+						<div class="stat-card">
+							<div class="stat-value">{stats.totalClients}</div>
+							<div class="stat-label">App Clients</div>
+						</div>
 					</div>
 				</div>
 
@@ -98,6 +106,18 @@
 						<a href="/rbac/permissions" class="action-link card">
 							<h3>Permission Management</h3>
 							<p class="text-muted">Define and manage system permissions</p>
+						</a>
+						<a href="/app-clients" class="action-link card">
+							<h3>App-to-App Integrations</h3>
+							<p class="text-muted">Register clients, rotate public keys, and test machine tokens</p>
+						</a>
+						<a href="/account" class="action-link card">
+							<h3>Account Tools</h3>
+							<p class="text-muted">Manage sessions, API keys, and OAuth providers</p>
+						</a>
+						<a href="/health" class="action-link card">
+							<h3>Health & Token Tools</h3>
+							<p class="text-muted">Inspect Karasu health, JWKS, and token introspection</p>
 						</a>
 					</div>
 				</div>

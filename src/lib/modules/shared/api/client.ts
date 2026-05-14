@@ -87,6 +87,34 @@ async function handleResponse<T>(response: Response): Promise<T> {
   return {} as T;
 }
 
+async function handleRawResponse<T>(response: Response): Promise<T> {
+  const contentType = response.headers.get('content-type');
+  const isJson = contentType?.includes('application/json');
+
+  if (!response.ok) {
+    let errorData: ApiResponse | null = null;
+    if (isJson) {
+      try {
+        errorData = await response.json();
+      } catch {
+        // Failed to parse JSON error
+      }
+    }
+
+    throw {
+      status: response.status,
+      message: errorData?.message || response.statusText || 'An error occurred',
+      error: errorData?.error
+    } as ApiError;
+  }
+
+  if (isJson) {
+    return (await response.json()) as T;
+  }
+
+  return {} as T;
+}
+
 // Refresh token logic
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
@@ -185,6 +213,58 @@ async function request<T>(
   }
 }
 
+async function rawRequest<T>(
+  endpoint: string,
+  options: RequestInit = {},
+  retry = true
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  const config: RequestInit = {
+    ...options,
+    headers: getHeaders(options.headers)
+  };
+
+  try {
+    const response = await fetch(url, config);
+
+    if (response.status === 401 && retry && getRefreshToken()) {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const newToken = await refreshAccessToken();
+          onTokenRefreshed(newToken);
+          isRefreshing = false;
+          return rawRequest<T>(endpoint, options, false);
+        } catch (error) {
+          isRefreshing = false;
+          clearTokens();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+          throw error;
+        }
+      }
+
+      return new Promise((resolve, reject) => {
+        subscribeTokenRefresh(() => {
+          rawRequest<T>(endpoint, options, false).then(resolve).catch(reject);
+        });
+      });
+    }
+
+    return handleRawResponse<T>(response);
+  } catch (error) {
+    if ((error as ApiError).status) {
+      throw error;
+    }
+    throw {
+      status: 0,
+      message: 'Network error or server is unreachable',
+      error: String(error)
+    } as ApiError;
+  }
+}
+
 // HTTP methods
 export const api = {
   get: <T>(endpoint: string, options?: RequestInit) =>
@@ -216,6 +296,21 @@ export const api = {
       ...options,
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined
+    }),
+
+  rawGet: <T>(endpoint: string, options?: RequestInit) =>
+    rawRequest<T>(endpoint, { ...options, method: 'GET' }),
+
+  rawPost: <T>(endpoint: string, data?: any, options?: RequestInit) =>
+    rawRequest<T>(endpoint, {
+      ...options,
+      method: 'POST',
+      body:
+        data instanceof URLSearchParams
+          ? data.toString()
+          : data
+            ? JSON.stringify(data)
+            : undefined
     })
 };
 

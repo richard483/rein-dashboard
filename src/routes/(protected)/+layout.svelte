@@ -1,9 +1,16 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { authStore, currentUser, isSuperAdmin, isAuthenticated } from '$lib/modules/shared/auth';
+	import {
+		authStore,
+		currentUser,
+		isSuperAdmin,
+		isAuthenticated,
+		isInitialized,
+		isLoading
+	} from '$lib/modules/shared/auth';
 	import { showToast } from '$lib/modules/shared/components';
+	import Spinner from '$lib/modules/shared/components/Spinner.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -14,15 +21,15 @@
 
 	const currentPath = $derived(page.url.pathname);
 
-	onMount(() => {
-		// Check authentication
+	$effect(() => {
+		if (!$isInitialized || $isLoading) return;
+
 		if (!$isAuthenticated) {
 			showToast('Please login to continue', 'error');
 			goto('/login');
 			return;
 		}
 
-		// Check superadmin access for protected routes
 		if (!$isSuperAdmin) {
 			showToast('Access denied. Superadmin privileges required.', 'error');
 			goto('/');
@@ -65,9 +72,13 @@
 				{#if $currentUser}
 					<nav class="nav">
 						{#if $isSuperAdmin}
+							<a href="/" class:active={isActive('/')}>Overview</a>
 							<a href="/users" class:active={isActive('/users')}>Users</a>
 							<a href="/rbac/roles" class:active={isActive('/rbac/roles')}>Roles</a>
 							<a href="/rbac/permissions" class:active={isActive('/rbac/permissions')}>Permissions</a>
+							<a href="/app-clients" class:active={isActive('/app-clients')}>App Clients</a>
+							<a href="/account" class:active={isActive('/account')}>Account</a>
+							<a href="/health" class:active={isActive('/health')}>Health</a>
 						{/if}
 					</nav>
 
@@ -83,7 +94,14 @@
 
 	<main class="main">
 		<div class="container">
-			{@render children()}
+			{#if !$isInitialized || $isLoading}
+				<div class="loading-shell">
+					<Spinner />
+					<p class="text-muted">Loading session...</p>
+				</div>
+			{:else}
+				{@render children()}
+			{/if}
 		</div>
 	</main>
 </div>
@@ -117,8 +135,9 @@
 
 	.nav {
 		display: flex;
-		gap: 1.5rem;
+		gap: 0.5rem;
 		flex: 1;
+		flex-wrap: wrap;
 	}
 
 	.nav a {
@@ -169,5 +188,13 @@
 	.main {
 		flex: 1;
 		padding: 2rem 0;
+	}
+
+	.loading-shell {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 1rem;
+		min-height: 240px;
 	}
 </style>

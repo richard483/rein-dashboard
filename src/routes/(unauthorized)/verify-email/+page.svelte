@@ -1,52 +1,38 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { authStore } from '$lib/modules/shared/auth';
 	import { showToast } from '$lib/modules/shared/components';
 	import Input from '$lib/modules/shared/components/Input.svelte';
 	import Button from '$lib/modules/shared/components/Button.svelte';
 
 	let email = $state('');
-	let verificationCode = $state('');
+	let token = $state('');
 	let loading = $state(false);
 	let verified = $state(false);
-	let error = $state('');
 
-	// Get email from URL query params if available
 	$effect(() => {
 		const urlParams = new URLSearchParams(window.location.search);
-		email = urlParams.get('email') || '';
+		token = urlParams.get('token') || token;
+		email = urlParams.get('email') || email;
 	});
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 
-		if (!email || !verificationCode) {
-			showToast('Please fill in all fields', 'error');
+		if (!token) {
+			showToast('Please enter the verification token', 'error');
 			return;
 		}
 
 		loading = true;
-		error = '';
 
 		try {
-			const response = await authStore.verifyEmail({
-				email,
-				verification_code: verificationCode
-			});
-
-			if (response.is_verified) {
-				verified = true;
-				showToast('Email verified successfully! You can now login.', 'success');
-				
-				// Redirect to login after a short delay
-				setTimeout(() => {
-					goto('/login');
-				}, 2000);
-			}
+			await authStore.verifyEmail({ token });
+			verified = true;
+			showToast('Email verified successfully! You can now login.', 'success');
+			setTimeout(() => goto('/login'), 2000);
 		} catch (err: any) {
-			error = err.message || 'Verification failed';
-			showToast(error, 'error');
+			showToast(err.message || 'Verification failed', 'error');
 		} finally {
 			loading = false;
 		}
@@ -76,9 +62,7 @@
 <div class="verify-container">
 	<div class="verify-card card">
 		<h1>Verify Email</h1>
-		<p class="text-muted mb-3">
-			Enter the verification code sent to your email to verify your account.
-		</p>
+		<p class="text-muted mb-3">Paste the verification token from your email.</p>
 
 		{#if verified}
 			<div class="alert alert-success">
@@ -86,41 +70,19 @@
 			</div>
 		{:else}
 			<form onsubmit={handleSubmit}>
-				<Input
-					label="Email"
-					type="email"
-					bind:value={email}
-					placeholder="Enter your email"
-					required
-				/>
-
-				<Input
-					label="Verification Code"
-					type="text"
-					bind:value={verificationCode}
-					placeholder="Enter the code from your email"
-					required
-				/>
-
+				<Input label="Verification Token" type="text" bind:value={token} placeholder="Paste token" required />
 				<Button type="submit" variant="primary" {loading}>
 					{loading ? 'Verifying...' : 'Verify Email'}
 				</Button>
 			</form>
 
 			<div class="resend-section mt-3">
-				<p class="text-muted">Didn't receive the code?</p>
+				<Input label="Email" type="email" bind:value={email} placeholder="Email for resend" />
 				<button class="btn-link" onclick={handleResend} disabled={loading || !email}>
 					Resend Verification Email
 				</button>
 			</div>
 		{/if}
-
-		<div class="mt-3 text-center">
-			<p class="text-muted">
-				Already verified? 
-				<a href="/login">Login</a>
-			</p>
-		</div>
 	</div>
 </div>
 
@@ -144,11 +106,6 @@
 		gap: 0.5rem;
 	}
 
-	:global(.verify-card .btn) {
-		width: 100%;
-		margin-top: 0.5rem;
-	}
-
 	.alert-success {
 		background-color: #d4edda;
 		border: 1px solid #c3e6cb;
@@ -165,11 +122,6 @@
 		text-decoration: underline;
 		padding: 0;
 		font-size: 0.9rem;
-	}
-
-	.btn-link:disabled {
-		color: #6c757d;
-		cursor: not-allowed;
 	}
 
 	.resend-section {

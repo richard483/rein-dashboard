@@ -37,6 +37,7 @@ export interface UserInfo {
   id: string;
   username: string;
   is_active: boolean;
+  roles?: string[];
 }
 
 // Profile Response from /auth/me
@@ -214,9 +215,10 @@ export interface LogoutRequest {
 
 // Register Request
 export interface RegisterRequest {
-  username: string;
+  user_name: string;
   email: string;
   password: string;
+  confirm_password: string;
 }
 
 export interface RegisterResponse {
@@ -226,13 +228,11 @@ export interface RegisterResponse {
 
 // Email Verification
 export interface VerifyEmailRequest {
-  email: string;
-  verification_code: string;
+  token: string;
 }
 
 export interface VerifyEmailResponse {
   message: string;
-  is_verified: boolean;
 }
 
 export interface ResendVerificationRequest {
@@ -246,6 +246,7 @@ export interface ResendVerificationResponse {
 // Forgot Password
 export interface ForgotPasswordRequest {
   email: string;
+  redirect_url: string;
 }
 
 export interface ForgotPasswordResponse {
@@ -254,9 +255,9 @@ export interface ForgotPasswordResponse {
 
 // Reset Password
 export interface ResetPasswordRequest {
-  email: string;
-  verification_code: string;
-  new_password: string;
+  token: string;
+  password: string;
+  confirm_password: string;
 }
 
 export interface ResetPasswordResponse {
@@ -267,6 +268,7 @@ export interface ResetPasswordResponse {
 export interface ChangePasswordRequest {
   current_password: string;
   new_password: string;
+  confirm_new_password: string;
 }
 
 export interface ChangePasswordResponse {
@@ -297,8 +299,106 @@ export interface AuthState {
   refreshToken: string | null;
   isAuthenticated: boolean;
   isSuperAdmin: boolean;
+  isInitialized: boolean;
   isLoading: boolean;
   error: ApiError | null;
+}
+
+export interface ApiKeyInfo {
+  id: string;
+  name: string;
+  expires_at?: string;
+  created_at: string;
+}
+
+export interface CreateApiKeyRequest {
+  name: string;
+  expires_in?: number | null;
+}
+
+export interface CreateApiKeyResponse {
+  api_key: string;
+  name: string;
+  expires_at?: string;
+  created_at: string;
+  id: string;
+}
+
+export interface ListApiKeysResponse {
+  api_keys: ApiKeyInfo[];
+  count: number;
+}
+
+export interface OAuthProviderListResponse extends Array<string> {}
+
+export interface OAuthClient {
+  id: string;
+  client_id: string;
+  name: string;
+  public_key_fingerprint: string;
+  allowed_scopes: string[];
+  allowed_audiences: string[];
+  is_active: boolean;
+  last_used_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateOAuthClientRequest {
+  name: string;
+  public_key_pem: string;
+  allowed_scopes: string[];
+  allowed_audiences: string[];
+}
+
+export interface UpdateOAuthClientRequest {
+  name: string;
+  allowed_scopes: string[];
+  allowed_audiences: string[];
+  is_active: boolean;
+}
+
+export interface UpdateOAuthClientPublicKeyRequest {
+  public_key_pem: string;
+}
+
+export interface OAuthClientListResponse {
+  clients: OAuthClient[];
+  count: number;
+}
+
+export interface MachineTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+}
+
+export interface OAuthIntrospectionResponse {
+  active: boolean;
+  client_id?: string;
+  scope?: string;
+  aud?: string;
+  iss?: string;
+  sub?: string;
+  exp?: number;
+}
+
+export interface JwksResponse {
+  keys: Array<Record<string, string>>;
+}
+
+export interface HealthComponent {
+  status: string;
+  message?: string;
+  response_time?: string;
+}
+
+export interface HealthStatus {
+  status: string;
+  timestamp: string;
+  version?: string;
+  checks?: Record<string, HealthComponent>;
 }
 
 // Toast Types
