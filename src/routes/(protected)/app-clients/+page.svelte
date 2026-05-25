@@ -16,7 +16,7 @@
 	let isActive = $state(true);
 
 	let tokenClientId = $state('');
-	let tokenAudience = $state('pg-client-api');
+	let tokenResource = $state('pg-client-api');
 	let tokenScope = $state('pg-client:execute');
 	let clientAssertion = $state('');
 	let tokenResponse = $state<MachineTokenResponse | null>(null);
@@ -114,8 +114,8 @@
 
 	async function requestToken(e: Event) {
 		e.preventDefault();
-		if (!tokenClientId || !tokenAudience || !tokenScope || !clientAssertion) {
-			showToast('Client ID, audience, scope, and assertion are required', 'error');
+		if (!tokenClientId || !tokenResource || !tokenScope || !clientAssertion) {
+			showToast('Client ID, resource, scope, and assertion are required', 'error');
 			return;
 		}
 
@@ -123,7 +123,7 @@
 			tokenResponse = await karasuApi.requestMachineToken({
 				grant_type: 'client_credentials',
 				client_id: tokenClientId,
-				audience: tokenAudience,
+				resource: tokenResource,
 				scope: tokenScope,
 				client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
 				client_assertion: clientAssertion
@@ -175,7 +175,7 @@
 			<h2>Machine Token Test</h2>
 			<form onsubmit={requestToken}>
 				<Input label="Client ID" bind:value={tokenClientId} placeholder="app_..." required />
-				<Input label="Audience" bind:value={tokenAudience} required />
+				<Input label="Resource" bind:value={tokenResource} required />
 				<Input label="Scope" bind:value={tokenScope} required />
 				<label>
 					Client Assertion JWT
