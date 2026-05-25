@@ -95,7 +95,7 @@ export async function introspectToken(token: string): Promise<OAuthIntrospection
 export async function requestMachineToken(data: {
 	grant_type: string;
 	client_id: string;
-	audience: string;
+	resource: string;
 	scope: string;
 	client_assertion_type: string;
 	client_assertion: string;
